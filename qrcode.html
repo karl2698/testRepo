@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인터랙티브 QR 코드 생성기</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #qrcode-container {
+            margin-top: 25px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #qrcode-container img {
+            max-width: 100%;
+        }
+        .placeholder-text {
+            color: #888;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>QR 코드 생성기 🎨</h1>
+        <input type="text" id="text-input" placeholder="웹사이트 주소 또는 텍스트를 입력하세요...">
+        <button onclick="generateQRCode()">QR 코드 생성</button>
+
+        <div id="qrcode-container">
+            <span class="placeholder-text">이곳에 QR 코드가 표시됩니다.</span>
+        </div>
+    </div>
+
+    <script>
+        function generateQRCode() {
+            const textInput = document.getElementById('text-input').value;
+            const qrContainer = document.getElementById('qrcode-container');
+
+            // 이전 QR 코드 및 플레이스홀더 텍스트 제거
+            qrContainer.innerHTML = '';
+
+            if (textInput.trim() === "") {
+                qrContainer.innerHTML = '<span class="placeholder-text">내용을 입력해주세요!</span>';
+                return;
+            }
+
+            try {
+                // QR 코드 생성 (qrcode-generator 라이브러리 사용)
+                const typeNumber = 4; // QR 코드의 복잡도 (1-40)
+                const errorCorrectionLevel = 'L'; // 오류 복원 수준 ('L', 'M', 'Q', 'H')
+                const qr = qrcode(typeNumber, errorCorrectionLevel);
+                qr.addData(textInput);
+                qr.make();
+                
+                // 생성된 QR 코드를 이미지(data URI)로 변환하여 표시
+                qrContainer.innerHTML = qr.createDataURL(10, 4); // (셀 크기, 여백)
+
+            } catch (error) {
+                console.error("QR 코드 생성 오류:", error);
+                qrContainer.innerHTML = '<span class="placeholder-text">QR 코드 생성에 실패했습니다. 너무 긴 텍스트일 수 있습니다.</span>';
+            }
+        }
+
+        // Enter 키를 눌렀을 때도 생성되도록 이벤트 리스너 추가
+        document.getElementById('text-input').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                generateQRCode();
+            }
+        });
+    </script>
+
+</body>
+</html>
